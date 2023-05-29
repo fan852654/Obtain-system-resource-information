@@ -18,22 +18,5 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SysInfoCollecter.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DataComm.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="SysInfoCollecter.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="all_types.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DataComm.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
