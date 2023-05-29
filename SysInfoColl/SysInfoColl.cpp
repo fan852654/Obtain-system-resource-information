@@ -622,6 +622,60 @@ break_get_gpuinfo_by_nvml:
 	return result;
 }
 
+int SysInfoColl::GetSystemRasConnections()
+{
+	DWORD dwCb = 0;
+	DWORD dwRet = ERROR_SUCCESS;
+	DWORD dwConnections = 0;
+	LPRASCONN lpRasConn = NULL;
+
+	dwRet = RasEnumConnections(lpRasConn, &dwCb, &dwConnections);
+	if (dwRet == ERROR_BUFFER_TOO_SMALL) {
+		lpRasConn = (LPRASCONN)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwCb);
+		if (lpRasConn == NULL) {
+			return dwConnections;
+		}
+		lpRasConn[0].dwSize = sizeof(RASCONN);
+
+		dwRet = RasEnumConnections(lpRasConn, &dwCb, &dwConnections);
+
+		if (ERROR_SUCCESS == dwRet) {
+			for (DWORD i = 0; i < dwConnections; i++) {
+				wprintf(L"%s\n", lpRasConn[i].szEntryName);
+			}
+		}
+		HeapFree(GetProcessHeap(), 0, lpRasConn);
+		lpRasConn = NULL;
+		return dwConnections;
+	}
+}
+
+BOOL SysInfoColl::GetWinetProxy(LPSTR lpszProxy, UINT nProxyLen)
+{
+	unsigned long        nSize = 4096;
+	char                 szBuf[4096] = { 0 };
+	INTERNET_PROXY_INFO* pProxyInfo = (INTERNET_PROXY_INFO*)szBuf;
+	if (!InternetQueryOption(NULL, INTERNET_OPTION_PROXY, pProxyInfo, &nSize))
+	{
+		return FALSE;
+	}
+	if (pProxyInfo->dwAccessType == INTERNET_OPEN_TYPE_DIRECT)
+	{
+		return FALSE;
+	}
+
+	LPCSTR lpszProxyList = (LPCSTR)(pProxyInfo + 1);
+	int nLen = strlen(lpszProxyList);
+	if (lpszProxy)
+	{
+
+		nProxyLen = min(nLen, nProxyLen - 1);
+		strncpy_s(lpszProxy, nProxyLen + 1, lpszProxyList, nLen);
+		lpszProxy[nProxyLen] = 0;
+	}
+	return TRUE;
+}
+
 std::vector<DeviceObj> SysInfoColl::GetAllDevices()
 {
 	std::vector<DeviceObj> result;

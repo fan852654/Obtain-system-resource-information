@@ -17,11 +17,15 @@
 #include <winioctl.h>
 #include <INITGUID.h>
 #include <Dbt.h>
+#include "ras.h"
+#include "raserror.h"
+#include "wininet.h"
 #pragma comment(lib,"ws2_32.lib")
 #pragma comment(lib,"psapi.lib")
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "setupapi.lib")
-
+#pragma comment(lib, "rasapi32.lib")
+#pragma comment(lib, "Wininet.lib")
 #include <vector>
 #include <map>
 #include <set>

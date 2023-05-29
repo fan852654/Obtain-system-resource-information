@@ -8,5 +8,5 @@ int main()
 {
     time_t ts = time(NULL);
     SysInfoColl sc;
-    sc.GetSystemEventLog(ts);
+    sc.GetSystemRasConnections();
 }

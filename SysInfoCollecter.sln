@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SysInfoCollecter", "SysInfoCollecter\SysInfoCollecter.vcxproj", "{A7ED1F5C-5F95-4114-AC3F-BD2107878ECD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BE699A7A-A1E3-4624-A90B-38ABA03780FB} = {BE699A7A-A1E3-4624-A90B-38ABA03780FB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SysInfoColl", "SysInfoColl\SysInfoColl.vcxproj", "{BE699A7A-A1E3-4624-A90B-38ABA03780FB}"
 EndProject

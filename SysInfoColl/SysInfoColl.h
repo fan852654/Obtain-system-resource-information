@@ -55,6 +55,18 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::vector<GpuInfo_Nvml> GetGpuInfoByNvml();
+	/// <summary>
+	/// 获取系统Ras链接数量
+	/// </summary>
+	/// <returns></returns>
+	int GetSystemRasConnections();
+	/// <summary>
+	/// 获取系统代理信息
+	/// </summary>
+	/// <param name="lpszProxy">输出的代理信息</param>
+	/// <param name="nProxyLen">代理信息长度</param>
+	/// <returns></returns>
+	BOOL GetWinetProxy(LPSTR lpszProxy, UINT nProxyLen);
 protected:
 	std::vector<DeviceObj> GetAllDevices();
 	BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
