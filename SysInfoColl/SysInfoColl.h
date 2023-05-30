@@ -33,12 +33,12 @@ public:
 	/// <param name="timeTick">获取现在到timeTick时间之内的日志</param>
 	/// <param name="eventName">获取的日志类别如Application，System</param>
 	/// <returns></returns>
-	std::vector<EventLogObj> GetSystemEventLog(unsigned long timeTick,std::wstring eventName = L"Application");
+	std::vector<EventLogObj> GetSystemEventLog(unsigned long timeTick, EventLogEnum eventName = EventLogEnum::EV_APPLICATION);
 	/// <summary>
 	/// 获取系统详细信息
 	/// 会保存至一个结构体中，直接调用
 	/// </summary>
-	void GetSystemDetils();
+	void RefreshSystemDetils();
 	/// <summary>
 	/// 获取进程列表
 	/// </summary>
@@ -71,6 +71,8 @@ protected:
 	std::vector<DeviceObj> GetAllDevices();
 	BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
 	void GetTimestamp(const DWORD Time, WCHAR DisplayString[]);
+	std::string GetDxVersion();
+	void GetSystemFoudationInfo();
 private:
 	DT::SystemInfos m_sysinfo;
 

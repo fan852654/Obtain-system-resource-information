@@ -8,5 +8,7 @@ int main()
 {
     time_t ts = time(NULL);
     SysInfoColl sc;
-    sc.GetSystemRasConnections();
+    std::vector<DeviceObj>a;
+    std::vector<DeviceObj>b;
+    sc.GetDeviceList(a,b);
 }

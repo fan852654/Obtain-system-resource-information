@@ -4,6 +4,8 @@
 SysInfoColl::SysInfoColl()
 {
 	m_mct = MonitorColType::USE_DC;
+	GetSystemFoudationInfo();
+	RefreshSystemDetils();
 }
 
 SysInfoColl::~SysInfoColl()
@@ -41,7 +43,7 @@ void SysInfoColl::GetDeviceList(std::vector<DeviceObj>& _installedDev, std::vect
 	m_devices = std::vector<DeviceObj>(alldevices);
 }
 
-std::vector<EventLogObj> SysInfoColl::GetSystemEventLog(unsigned long timeTick, std::wstring eventName)
+std::vector<EventLogObj> SysInfoColl::GetSystemEventLog(unsigned long timeTick, EventLogEnum eventNamet)
 {
 	std::vector< EventLogObj> result;
 	m_sysinfo.getsystemeventlogwarning = GetEventLogWarning::GELW_NO_ERROR;
@@ -49,7 +51,19 @@ std::vector<EventLogObj> SysInfoColl::GetSystemEventLog(unsigned long timeTick, 
 	DWORD dwByteRequd, cbSize = 0, dwBytesToRead = MAX_RECORD_BUFFER_SIZE, dwBytesRead, dwMinimumBytesNeeded, numRecord;
 	CONST wchar_t* pEventTypeNames[] = { L"Error", L"Warning", L"Informational", L"Audit Success", L"Audit Failure" };
 	PBYTE pBuffer, currentData, endRecord;
-	HANDLE eventHandle = OpenEventLog(NULL, eventName.c_str());
+	HANDLE eventHandle = NULL;
+	switch (eventNamet)
+	{
+	case DT::EV_SYSTEM:
+		eventHandle = OpenEventLog(NULL, L"System");
+		break;
+	case DT::EV_APPLICATION:
+		eventHandle = OpenEventLog(NULL, L"Application");
+		break;
+	case DT::EV_SECURITY:
+		eventHandle = OpenEventLog(NULL, L"Security");
+		break;
+	}
 	if (eventHandle == INVALID_HANDLE_VALUE)
 	{
 		m_sysinfo.getsystemeventloglasterror = GetLastError();
@@ -138,97 +152,8 @@ std::vector<EventLogObj> SysInfoColl::GetSystemEventLog(unsigned long timeTick, 
 	return result;
 }
 
-void SysInfoColl::GetSystemDetils()
+void SysInfoColl::RefreshSystemDetils()
 {
-	//获取系统基本参数
-	{
-		m_sysinfo.osinfo.getsysteminfowarning = GetSystemInfoWarning::GSIW_NO_ERROR;
-		SYSTEM_INFO system_info;
-		memset(&system_info, 0, sizeof(SYSTEM_INFO));
-		GetSystemInfo(&system_info);
-		m_sysinfo.cpuinfo.dwNumberOfProcessors = system_info.dwNumberOfProcessors;
-		OSVERSIONINFOEX os;
-		os.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-		if (GetVersionEx((OSVERSIONINFO*)&os))
-		{
-			m_sysinfo.osinfo.majorVersion = os.dwMajorVersion;
-			m_sysinfo.osinfo.minorVersion = os.dwMinorVersion;
-			m_sysinfo.osinfo.buildNumber = os.dwBuildNumber;
-			m_sysinfo.osinfo.platformId = os.dwPlatformId;
-			m_sysinfo.osinfo.serciveMajor = os.wServicePackMajor;
-			m_sysinfo.osinfo.serciveMinor = os.wServicePackMinor;
-		}
-		else 
-		{
-			m_sysinfo.osinfo.getsysteminfowarning = GetSystemInfoWarning::GET_VERSION_ERR;
-		}
-	}
-	//获取CPU信息
-	{
-		m_sysinfo.getcpuinfowarning = GetCPUInfoWarning::GCIW_NO_ERROR;
-		std::wstring strPath = L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0";
-		CRegKey regkey;
-		LONG lResult;
-		DWORD dwSize = 50;
-		wmemset(m_sysinfo.cpuinfo.cpuname, 0, 50);
-		lResult = regkey.Open(HKEY_LOCAL_MACHINE, strPath.c_str(), KEY_ALL_ACCESS);
-		if (lResult != ERROR_SUCCESS)
-		{
-			m_sysinfo.getcpuinfowarning = m_sysinfo.getcpuinfowarning | GetCPUInfoWarning::FAILED_TO_OPEN_REGEDIT;
-			goto start_check_cpu_core;
-		}
-
-		if (ERROR_SUCCESS != regkey.QueryStringValue(_T("ProcessorNameString"), m_sysinfo.cpuinfo.cpuname, &dwSize))
-		{
-			m_sysinfo.getcpuinfowarning = m_sysinfo.getcpuinfowarning | GetCPUInfoWarning::FAILED_TO_QUERY_PROCESSNAMESTRING;
-		}
-
-		//查询CPU主频  
-		if (ERROR_SUCCESS != regkey.QueryDWORDValue(_T("~MHz"), m_sysinfo.cpuinfo.mhz))
-		{
-			m_sysinfo.getcpuinfowarning = m_sysinfo.getcpuinfowarning | GetCPUInfoWarning::FAILED_TO_QUERY_MHZ;
-		}
-		regkey.Close();
-
-	start_check_cpu_core:
-		//获取CPU核心数目  
-		SYSTEM_INFO si;
-		memset(&si, 0, sizeof(SYSTEM_INFO));
-		GetSystemInfo(&si);
-		DWORD dwNum = si.dwNumberOfProcessors;
-		switch (si.dwProcessorType)
-		{
-		case PROCESSOR_INTEL_386:
-			m_sysinfo.cpuinfo.chProcessorType = "Intel 386 processor";
-			break;
-		case PROCESSOR_INTEL_486:
-			m_sysinfo.cpuinfo.chProcessorType = "Intel 486 Processor";
-			break;
-		case PROCESSOR_INTEL_PENTIUM:
-			m_sysinfo.cpuinfo.chProcessorType = "Intel Pentium Processor";
-			break;
-		case PROCESSOR_INTEL_IA64:
-			m_sysinfo.cpuinfo.chProcessorType = "Intel IA64 Processor";
-			break;
-		case PROCESSOR_AMD_X8664:
-			m_sysinfo.cpuinfo.chProcessorType = "AMD X8664 Processor";
-			break;
-		default:
-			m_sysinfo.cpuinfo.chProcessorType = "Unknown";
-			break;
-		}
-
-		int cpuInfo[4] = { -1 };
-
-		__cpuid(cpuInfo, 0x80000002);
-		memcpy(m_sysinfo.cpuinfo.cpu_manufacture, cpuInfo, sizeof(cpuInfo));
-
-		__cpuid(cpuInfo, 0x80000003);
-		memcpy(m_sysinfo.cpuinfo.cpu_type, cpuInfo, sizeof(cpuInfo));
-
-		__cpuid(cpuInfo, 0x80000004);
-		memcpy(m_sysinfo.cpuinfo.cpu_freq, cpuInfo, sizeof(cpuInfo));
-	}
 	//获取内存信息
 	{
 		MEMORYSTATUSEX statex;
@@ -319,6 +244,7 @@ void SysInfoColl::GetSystemDetils()
 	//获取GPU信息 by dx
 	{
 		m_sysinfo.getgpuinfowarning = GetGPUInfoWarning::GGIW_NO_ERROR;
+		m_sysinfo.DirectXVersion = GetDxVersion();
 		IDXGIFactory* pFactory;
 		IDXGIAdapter* pAdapter;
 		std::vector <IDXGIAdapter*> vAdapters;
@@ -449,9 +375,9 @@ std::vector<ProcessObj> SysInfoColl::GetProcessDetils(bool setdebugflag)
 				obj.getprocessdetilswarning = obj.getprocessdetilswarning | GetProcessDetilsWarning::FAILED_QUERY_MEMORY_INFO;
 			}
 
-			if (GetProcessTimes(hProcess, obj.lpCreationTime, obj.lpExitTime, obj.lpKernelTime, obj.lpUserTime))
+			if (GetProcessTimes(hProcess, &obj.lpCreationTime, &obj.lpExitTime, &obj.lpKernelTime, &obj.lpUserTime))
 			{
-				obj.cpuUsageTime = (static_cast<double>(obj.FileTimeToInt64(*obj.lpKernelTime)) + obj.FileTimeToInt64(*obj.lpUserTime)) / (m_sysinfo.cpuinfo.dwNumberOfProcessors * 1.0);
+				obj.cpuUsageTime = (static_cast<double>(obj.FileTimeToInt64(obj.lpKernelTime)) + obj.FileTimeToInt64(obj.lpUserTime)) / (m_sysinfo.cpuinfo.dwNumberOfProcessors * 1.0);
 			}
 			else {
 				obj.getprocessdetilswarning = obj.getprocessdetilswarning | GetProcessDetilsWarning::FAILED_QUERY_TIMES_INFO;
@@ -674,6 +600,141 @@ BOOL SysInfoColl::GetWinetProxy(LPSTR lpszProxy, UINT nProxyLen)
 		lpszProxy[nProxyLen] = 0;
 	}
 	return TRUE;
+}
+
+std::string SysInfoColl::GetDxVersion()
+{
+	HKEY  hKeyResult = NULL;
+	DWORD dwSize = 0;
+	DWORD dwDataType = 0;
+	std::string strValue("");
+	if (ERROR_SUCCESS == ::RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\DirectX", 0, KEY_QUERY_VALUE, &hKeyResult))
+	{
+		::RegQueryValueEx(hKeyResult, L"Version", 0, &dwDataType, NULL, &dwSize);
+		switch (dwDataType)
+		{
+		case REG_MULTI_SZ:
+		{
+			//分配内存大小
+			BYTE* lpValue = new BYTE[dwSize];
+			//获取注册表中指定的键所对应的值
+			LONG lRet = ::RegQueryValueEx(hKeyResult, L"Version", 0, &dwDataType, lpValue, &dwSize);
+			delete[] lpValue;
+			break;
+		}
+		case REG_SZ:
+		{
+			//分配内存大小
+			wchar_t* lpValue = new wchar_t[dwSize];
+			memset(lpValue, 0, dwSize * sizeof(wchar_t));
+			//获取注册表中指定的键所对应的值
+			if (ERROR_SUCCESS == ::RegQueryValueEx(hKeyResult, L"Version", 0, &dwDataType, (LPBYTE)lpValue, &dwSize))
+			{
+				std::wstring wstrValue(lpValue);
+				strValue = Data_Comm::ws2s(wstrValue);
+			}
+			delete[] lpValue;
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	::RegCloseKey(hKeyResult);
+	return strValue;
+}
+
+void SysInfoColl::GetSystemFoudationInfo()
+{
+	//获取系统基本参数
+	{
+		m_sysinfo.osinfo.getsysteminfowarning = GetSystemInfoWarning::GSIW_NO_ERROR;
+		SYSTEM_INFO system_info;
+		memset(&system_info, 0, sizeof(SYSTEM_INFO));
+		GetSystemInfo(&system_info);
+		m_sysinfo.cpuinfo.dwNumberOfProcessors = system_info.dwNumberOfProcessors;
+		OSVERSIONINFOEX os;
+		os.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+		if (GetVersionEx((OSVERSIONINFO*)&os))
+		{
+			m_sysinfo.osinfo.majorVersion = os.dwMajorVersion;
+			m_sysinfo.osinfo.minorVersion = os.dwMinorVersion;
+			m_sysinfo.osinfo.buildNumber = os.dwBuildNumber;
+			m_sysinfo.osinfo.platformId = os.dwPlatformId;
+			m_sysinfo.osinfo.serciveMajor = os.wServicePackMajor;
+			m_sysinfo.osinfo.serciveMinor = os.wServicePackMinor;
+		}
+		else
+		{
+			m_sysinfo.osinfo.getsysteminfowarning = GetSystemInfoWarning::GET_VERSION_ERR;
+		}
+	}
+	//获取CPU信息
+	{
+		m_sysinfo.getcpuinfowarning = GetCPUInfoWarning::GCIW_NO_ERROR;
+		std::wstring strPath = L"HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0";
+		CRegKey regkey;
+		LONG lResult;
+		DWORD dwSize = 50;
+		wmemset(m_sysinfo.cpuinfo.cpuname, 0, 50);
+		lResult = regkey.Open(HKEY_LOCAL_MACHINE, strPath.c_str(), KEY_ALL_ACCESS);
+		if (lResult != ERROR_SUCCESS)
+		{
+			m_sysinfo.getcpuinfowarning = m_sysinfo.getcpuinfowarning | GetCPUInfoWarning::FAILED_TO_OPEN_REGEDIT;
+			goto start_check_cpu_core;
+		}
+
+		if (ERROR_SUCCESS != regkey.QueryStringValue(_T("ProcessorNameString"), m_sysinfo.cpuinfo.cpuname, &dwSize))
+		{
+			m_sysinfo.getcpuinfowarning = m_sysinfo.getcpuinfowarning | GetCPUInfoWarning::FAILED_TO_QUERY_PROCESSNAMESTRING;
+		}
+
+		//查询CPU主频  
+		if (ERROR_SUCCESS != regkey.QueryDWORDValue(_T("~MHz"), m_sysinfo.cpuinfo.mhz))
+		{
+			m_sysinfo.getcpuinfowarning = m_sysinfo.getcpuinfowarning | GetCPUInfoWarning::FAILED_TO_QUERY_MHZ;
+		}
+		regkey.Close();
+
+	start_check_cpu_core:
+		//获取CPU核心数目  
+		SYSTEM_INFO si;
+		memset(&si, 0, sizeof(SYSTEM_INFO));
+		GetSystemInfo(&si);
+		DWORD dwNum = si.dwNumberOfProcessors;
+		switch (si.dwProcessorType)
+		{
+		case PROCESSOR_INTEL_386:
+			m_sysinfo.cpuinfo.chProcessorType = "Intel 386 processor";
+			break;
+		case PROCESSOR_INTEL_486:
+			m_sysinfo.cpuinfo.chProcessorType = "Intel 486 Processor";
+			break;
+		case PROCESSOR_INTEL_PENTIUM:
+			m_sysinfo.cpuinfo.chProcessorType = "Intel Pentium Processor";
+			break;
+		case PROCESSOR_INTEL_IA64:
+			m_sysinfo.cpuinfo.chProcessorType = "Intel IA64 Processor";
+			break;
+		case PROCESSOR_AMD_X8664:
+			m_sysinfo.cpuinfo.chProcessorType = "AMD X8664 Processor";
+			break;
+		default:
+			m_sysinfo.cpuinfo.chProcessorType = "Unknown";
+			break;
+		}
+
+		int cpuInfo[4] = { -1 };
+
+		__cpuid(cpuInfo, 0x80000002);
+		memcpy(m_sysinfo.cpuinfo.cpu_manufacture, cpuInfo, sizeof(cpuInfo));
+
+		__cpuid(cpuInfo, 0x80000003);
+		memcpy(m_sysinfo.cpuinfo.cpu_type, cpuInfo, sizeof(cpuInfo));
+
+		__cpuid(cpuInfo, 0x80000004);
+		memcpy(m_sysinfo.cpuinfo.cpu_freq, cpuInfo, sizeof(cpuInfo));
+	}
 }
 
 std::vector<DeviceObj> SysInfoColl::GetAllDevices()
