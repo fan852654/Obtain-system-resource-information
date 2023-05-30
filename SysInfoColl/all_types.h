@@ -32,13 +32,13 @@
 #include <tchar.h>
 #include <stdio.h>
 #ifdef ENABLED_GPU
-#include <cuda_runtime_api.h>
-#pragma comment(lib,"cuda.lib")
-#pragma comment(lib,"cudadevrt.lib")
-#pragma comment(lib,"cudart.lib")
-#pragma comment(lib,"cudart_static.lib")
-#pragma comment(lib,"cublas.lib")
-#pragma comment(lib,"cublasLt.lib")
+//#include <cuda_runtime_api.h>
+//#pragma comment(lib,"cuda.lib")
+//#pragma comment(lib,"cudadevrt.lib")
+//#pragma comment(lib,"cudart.lib")
+//#pragma comment(lib,"cudart_static.lib")
+//#pragma comment(lib,"cublas.lib")
+//#pragma comment(lib,"cublasLt.lib")
 #include <nvml.h>
 #pragma comment(lib,"nvml.lib")
 #endif
