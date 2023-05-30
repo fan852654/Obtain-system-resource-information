@@ -31,14 +31,22 @@
 #include <set>
 #include <tchar.h>
 #include <stdio.h>
-#include <nvml.h>
+#ifdef ENABLED_GPU
 #include <cuda_runtime_api.h>
+#pragma comment(lib,"cuda.lib")
+#pragma comment(lib,"cudadevrt.lib")
+#pragma comment(lib,"cudart.lib")
+#pragma comment(lib,"cudart_static.lib")
+#pragma comment(lib,"cublas.lib")
+#pragma comment(lib,"cublasLt.lib")
+#include <nvml.h>
+#pragma comment(lib,"nvml.lib")
+#endif
+
 #include <DXGI.h>
 #pragma comment(lib,"DXGI.lib")
 #include <strsafe.h>
 
-#define PROVIDER_NAME           L"MyEventProvider"
-#define RESOURCE_DLL            L"<path>\\Provider.dll"
 #define MAX_TIMESTAMP_LEN       23 + 1   // mm/dd/yyyy hh:mm:ss.mmm
 #define MAX_RECORD_BUFFER_SIZE  0x10000  // 64K
 #define INFO_BUFFER_SIZE 32767
@@ -217,6 +225,7 @@ namespace DT
 		std::vector<std::pair<int, int>> avil_ratio;
 		int output_device_count;
 	};
+#ifdef ENABLED_GPU
 	struct GpuInfo_Nvml
 	{
 		char name[NVML_DEVICE_NAME_BUFFER_SIZE];
@@ -233,6 +242,7 @@ namespace DT
 		//每个应用程序使用的内存
 		std::map<int/*进程id*/, double/*显存*/> proc_mem;
 	};
+#endif
 	struct CpuInfo
 	{
 		wchar_t cpuname[50];

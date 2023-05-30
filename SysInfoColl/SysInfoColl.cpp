@@ -462,7 +462,7 @@ std::vector<ServicesObj> SysInfoColl::GetSystemServicesList()
 	}
 	return servList;
 }
-
+#ifdef ENABLED_GPU
 std::vector<GpuInfo_Nvml> SysInfoColl::GetGpuInfoByNvml()
 {
 	std::vector<GpuInfo_Nvml> result;
@@ -547,6 +547,7 @@ break_get_gpuinfo_by_nvml:
 	nvmlShutdown();
 	return result;
 }
+#endif
 
 int SysInfoColl::GetSystemRasConnections()
 {

@@ -50,11 +50,13 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	std::vector<ServicesObj> GetSystemServicesList();
+#ifdef ENABLED_GPU
 	/// <summary>
 	/// 通过nvml获取GPU信息及每个GPU中正在运行的进程及进程占用内存空间
 	/// </summary>
 	/// <returns></returns>
 	std::vector<GpuInfo_Nvml> GetGpuInfoByNvml();
+#endif
 	/// <summary>
 	/// 获取系统Ras链接数量
 	/// </summary>
