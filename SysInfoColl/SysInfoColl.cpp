@@ -598,6 +598,7 @@ std::vector<GpuInfo_Nvml> SysInfoColl::GetGpuInfoByNvml()
 
 break_get_gpuinfo_by_nvml:
 	nvmlShutdownFunc();
+	FreeLibrary(nvml_dll);
 	return result;
 }
 
