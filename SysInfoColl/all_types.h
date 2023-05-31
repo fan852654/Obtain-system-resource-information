@@ -332,6 +332,7 @@ namespace DT
 		int getsystemeventlogwarning;
 		DWORD getsystemeventloglasterror;
 	};
+	typedef UINT(*GetDpiForWindow_USER32)(HWND hwnd);
 }
 
 namespace Nvml_Sic

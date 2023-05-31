@@ -188,20 +188,28 @@ void SysInfoColl::RefreshSystemDetils()
 			m_sysinfo.monitor_x = GetSystemMetrics(SM_CXFULLSCREEN);
 			m_sysinfo.monitor_y = GetSystemMetrics(SM_CYFULLSCREEN);
 			HWND hd = GetDesktopWindow();
-			int dpi = GetDpiForWindow(hd);
-			switch (dpi) {
-			case 96:
-				m_sysinfo.monitor_zoom = 1;
-				break;
-			case 120:
-				m_sysinfo.monitor_zoom = 1.25;
-				break;
-			case 144:
-				m_sysinfo.monitor_zoom = 1.5;
-				break;
-			case 192:
-				m_sysinfo.monitor_zoom = 2;
-				break;
+			HINSTANCE userdll = NULL;
+			userdll = LoadLibrary(L"user32.dll");
+			if (userdll) {
+				GetDpiForWindow_USER32 GetDpiForWindowFunc = (GetDpiForWindow_USER32)GetProcAddress(userdll, "GetDpiForWindow");
+				if (GetDpiForWindowFunc) {
+					int dpi = GetDpiForWindowFunc(hd);
+					switch (dpi) {
+					case 96:
+						m_sysinfo.monitor_zoom = 1;
+						break;
+					case 120:
+						m_sysinfo.monitor_zoom = 1.25;
+						break;
+					case 144:
+						m_sysinfo.monitor_zoom = 1.5;
+						break;
+					case 192:
+						m_sysinfo.monitor_zoom = 2;
+						break;
+					}
+				}
+				FreeLibrary(userdll);
 			}
 			break;
 		}
