@@ -462,92 +462,145 @@ std::vector<ServicesObj> SysInfoColl::GetSystemServicesList()
 	}
 	return servList;
 }
-#ifdef ENABLED_GPU
+
 std::vector<GpuInfo_Nvml> SysInfoColl::GetGpuInfoByNvml()
 {
 	std::vector<GpuInfo_Nvml> result;
 	m_sysinfo.getgpuinfowarningfromnv = GetGPUInfoWarning::GGIW_NO_ERROR;
-	nvmlReturn_t res;
+	Nvml_Sic::nvmlReturn_enum res;
 	unsigned int device_count;
-	res = nvmlInit();
-	if (res != NVML_SUCCESS)
+	HINSTANCE nvml_dll = NULL;
+	nvml_dll = LoadLibrary(L"nvml.dll");
+	if (!nvml_dll) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVML_DLL;
+		return result;
+	}
+	Nvml_Sic::nvmlInit_nvml nvmlInitFunc = (Nvml_Sic::nvmlInit_nvml)GetProcAddress(nvml_dll, "nvmlInit");
+	Nvml_Sic::nvmlShutdown_nvml nvmlShutdownFunc = (Nvml_Sic::nvmlShutdown_nvml)GetProcAddress(nvml_dll, "nvmlShutdown");
+	Nvml_Sic::nvmlErrorString_nvml nvmlErrorStringFunc = (Nvml_Sic::nvmlErrorString_nvml)GetProcAddress(nvml_dll, "nvmlErrorString");
+	Nvml_Sic::nvmlDeviceGetCount_nvml nvmlDeviceGetCountFunc = (Nvml_Sic::nvmlDeviceGetCount_nvml)GetProcAddress(nvml_dll, "nvmlDeviceGetCount");
+	Nvml_Sic::nvmlDeviceGetHandleByIndex_nvml nvmlDeviceGetHandleByIndexFunc = (Nvml_Sic::nvmlDeviceGetHandleByIndex_nvml)GetProcAddress(nvml_dll, "nvmlDeviceGetHandleByIndex");
+	Nvml_Sic::nvmlDeviceGetName_nvml nvmlDeviceGetNameFunc = (Nvml_Sic::nvmlDeviceGetName_nvml)GetProcAddress(nvml_dll, "nvmlDeviceGetName");
+	Nvml_Sic::nvmlDeviceGetUtilizationRates_nvml nvmlDeviceGetUtilizationRatesFunc = (Nvml_Sic::nvmlDeviceGetUtilizationRates_nvml)GetProcAddress(nvml_dll, "nvmlDeviceGetUtilizationRates");
+	Nvml_Sic::nvmlDeviceGetMemoryInfo_nvml nvmlDeviceGetMemoryInfoFunc = (Nvml_Sic::nvmlDeviceGetMemoryInfo_nvml)GetProcAddress(nvml_dll, "nvmlDeviceGetMemoryInfo");
+	Nvml_Sic::nvmlDeviceGetComputeRunningProcesses_nvml nvmlDeviceGetComputeRunningProcessesFunc = (Nvml_Sic::nvmlDeviceGetComputeRunningProcesses_nvml)GetProcAddress(nvml_dll, "nvmlDeviceGetComputeRunningProcesses");
+	if (!nvmlInitFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLINITFUNC_;
+		return result;
+	}
+	if (!nvmlShutdownFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLSHUTDOWNFUNC_;
+		return result;
+	}
+	if (!nvmlDeviceGetNameFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLDEVICEGETNAMEFUNC_;
+	}
+	if (!nvmlDeviceGetUtilizationRatesFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLDEVICEGETUTILIZATIONTATESFUNC_;
+	}
+	if (!nvmlDeviceGetMemoryInfoFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLDEVICEGETMEMORYINFOFUNC_;
+	}
+	if (!nvmlDeviceGetComputeRunningProcessesFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLDEVICEGETCOMPUTERUNNINGPROCESSESFUNC_;
+	}
+	res = nvmlInitFunc();
+	if (res != Nvml_Sic::NVML_SUCCESS)
 	{
 		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_NVML_INIT;
 		m_sysinfo.getgpuinfonvlasterror = res;
 		goto break_get_gpuinfo_by_nvml;
 	}
-	res = nvmlDeviceGetCount(&device_count);
-	if (res != NVML_SUCCESS)
+	if (!nvmlDeviceGetCountFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLGETCOUNTFUNC_;
+		m_sysinfo.getgpuinfonvlasterror = res;
+		goto break_get_gpuinfo_by_nvml;
+	}
+	res = nvmlDeviceGetCountFunc(&device_count);
+	if (res != Nvml_Sic::NVML_SUCCESS)
 	{
 		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_GET_DEVICE_GPU_COUNT;
 		m_sysinfo.getgpuinfonvlasterror = res;
 		goto break_get_gpuinfo_by_nvml;
 	}
+	if (!nvmlDeviceGetHandleByIndexFunc) {
+		m_sysinfo.getgpuinfowarningfromnv = m_sysinfo.getgpuinfowarningfromnv | GetGPUInfoWarning::FAILED_LOAD_NVMLGETDEVICEHANDLEBUINDEXFUNC_;
+		m_sysinfo.getgpuinfonvlasterror = res;
+		goto break_get_gpuinfo_by_nvml;
+	}
 	for (int i = 0; i < device_count; i++)
 	{
-		nvmlDevice_t device;
-		nvmlPciInfo_t pci;
-		res = nvmlDeviceGetHandleByIndex(i, &device);
+		Nvml_Sic::nvmlDevice_t device;
+		res = nvmlDeviceGetHandleByIndexFunc(i, &device);
 		m_sysinfo.getgpuinfolooperrors.insert(std::make_pair(i, std::pair<int, std::vector<std::string>>(0, std::vector<std::string>())));
-		if (res != NVML_SUCCESS)
+		if (res != Nvml_Sic::NVML_SUCCESS)
 		{
 			m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_HANDLE;
-			m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorString(res)));
+			m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorStringFunc(res)));
 			continue;
 		}
 		GpuInfo_Nvml ginInfo;
-		res = nvmlDeviceGetName(device, ginInfo.name, NVML_DEVICE_NAME_BUFFER_SIZE);
-		if (res != NVML_SUCCESS)
-		{
-			m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_NAME;
-			m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorString(res)));
+		if (nvmlDeviceGetNameFunc) {
+			res = nvmlDeviceGetNameFunc(device, ginInfo.name, NVML_DEVICE_NAME_BUFFER_SIZE);
+			if (res != Nvml_Sic::NVML_SUCCESS)
+			{
+				m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_NAME;
+				m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorStringFunc(res)));
+			}
 		}
-		nvmlUtilization_t utilization;
-		res = nvmlDeviceGetUtilizationRates(device, &utilization);
-		if (res != NVML_SUCCESS)
-		{
-			m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_UTILIZATION_RATES;
-			m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorString(res)));
+		
+		Nvml_Sic::nvmlUtilization_t utilization{ 0 };
+		if (nvmlDeviceGetUtilizationRatesFunc) {
+			res = nvmlDeviceGetUtilizationRatesFunc(device, &utilization);
+			if (res != Nvml_Sic::NVML_SUCCESS)
+			{
+				m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_UTILIZATION_RATES;
+				m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorStringFunc(res)));
+			}
+			else {
+				ginInfo.util_gpu = utilization.gpu;
+				ginInfo.util_memory = utilization.memory;
+			}
 		}
-		else {
-			ginInfo.util_gpu = utilization.gpu;
-			ginInfo.util_memory = utilization.memory;
-		}
-		nvmlMemory_t memory;
-		res = nvmlDeviceGetMemoryInfo(device, &memory);
-		if (res != NVML_SUCCESS)
-		{
-			m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_MEMORY_INFO;
-			m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorString(res)));
-		}
-		else {
-			ginInfo.used = memory.used;
-			ginInfo.free = memory.free;
-			ginInfo.total = memory.total;
+		Nvml_Sic::nvmlMemory_t memory{ 0 };
+		if (nvmlDeviceGetMemoryInfoFunc) {
+			res = nvmlDeviceGetMemoryInfoFunc(device, &memory);
+			if (res != Nvml_Sic::NVML_SUCCESS)
+			{
+				m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_MEMORY_INFO;
+				m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorStringFunc(res)));
+			}
+			else {
+				ginInfo.used = memory.used;
+				ginInfo.free = memory.free;
+				ginInfo.total = memory.total;
+			}
 		}
 		unsigned int infoCnt;
-		nvmlProcessInfo_t* nvProcInfos;
-		res = nvmlDeviceGetComputeRunningProcesses(device, &infoCnt, nvProcInfos);
-		if (res != NVML_SUCCESS)
-		{
-			m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_QUERY_RUNNINGPROCESS;
-			m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorString(res)));
-		}
-		else {
-			for (int j = 0; j < infoCnt; j++)
+		Nvml_Sic::nvmlProcessInfo_t* nvProcInfos{};
+		if (nvmlDeviceGetComputeRunningProcessesFunc) {
+			res = nvmlDeviceGetComputeRunningProcessesFunc(device, &infoCnt, nvProcInfos);
+			if (res != Nvml_Sic::NVML_SUCCESS)
 			{
-				nvmlProcessInfo_t info = nvProcInfos[j];
-				ginInfo.proc_mem.insert(std::make_pair(info.pid, info.usedGpuMemory / DIV / DIV));
+				m_sysinfo.getgpuinfolooperrors[i].first = m_sysinfo.getgpuinfolooperrors[i].first | GetGPUInfoWarning::FAILED_GET_DEVICE_QUERY_RUNNINGPROCESS;
+				m_sysinfo.getgpuinfolooperrors[i].second.push_back(std::string(nvmlErrorStringFunc(res)));
+			}
+			else {
+				for (int j = 0; j < infoCnt; j++)
+				{
+					Nvml_Sic::nvmlProcessInfo_t info = nvProcInfos[j];
+					ginInfo.proc_mem.insert(std::make_pair(info.pid, info.usedGpuMemory / DIV / DIV));
+				}
 			}
 		}
 		result.push_back(ginInfo);
 	}
 
 break_get_gpuinfo_by_nvml:
-	nvmlShutdown();
+	nvmlShutdownFunc();
 	return result;
 }
-#endif
+
 
 int SysInfoColl::GetSystemRasConnections()
 {
@@ -846,4 +899,9 @@ void SysInfoColl::GetTimestamp(const DWORD Time, WCHAR DisplayString[])
 	FileTimeToSystemTime(&ftLocal, &st);
 	StringCchPrintf(DisplayString, MAX_TIMESTAMP_LEN, L"%d-%d-%d %.2d:%.2d:%.2d",
 		st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+}
+
+DT::SystemInfos* SysInfoColl::GetSystemInfosStruct()
+{
+	return &m_sysinfo;
 }

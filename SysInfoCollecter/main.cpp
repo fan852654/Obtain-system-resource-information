@@ -8,7 +8,5 @@ int main()
 {
     time_t ts = time(NULL);
     SysInfoColl sc;
-    std::vector<DeviceObj>a;
-    std::vector<DeviceObj>b;
-    sc.GetDeviceList(a,b);
+    sc.GetGpuInfoByNvml();
 }
