@@ -10,6 +10,11 @@ SicMpiPool::~SicMpiPool()
 {
 }
 
+int SicMpiPool::GetOmpThreadsNumbers()
+{
+	return MAX_MPI_POOL_COUNT;
+}
+
 void SicMpiPool::ChangeMaxPoolCnt(int _cnt)
 {
 	m_lockPool.lock();
@@ -20,9 +25,9 @@ void SicMpiPool::ChangeMaxPoolCnt(int _cnt)
 SicMpiPool* SicMpiPool::getInstance()
 {
 	m_mutex_mpipool->lock();
-	if (instance == nullptr) {
-		instance = new SicMpiPool();
+	if (instancePool == nullptr) {
+		instancePool = new SicMpiPool();
 	}
 	m_mutex_mpipool->unlock();
-	return instance;
+	return instancePool;
 }
