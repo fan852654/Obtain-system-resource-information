@@ -74,6 +74,10 @@
     <IncludePath>D:\git\Obtain-system-resource-information\SysInfoColl;F:\NVIDIA GPU Computing Toolkit\CUDA\v12.1\include;$(VC_IncludePath);$(IncludePath)</IncludePath>
     <LibraryPath>F:\NVIDIA GPU Computing Toolkit\CUDA\v12.1\lib\x64;$(VC_LibraryPath_x64);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>D:\git\Obtain-system-resource-information\SysInfoColl;F:\NVIDIA GPU Computing Toolkit\CUDA\v12.1\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>F:\NVIDIA GPU Computing Toolkit\CUDA\v12.1\lib\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
