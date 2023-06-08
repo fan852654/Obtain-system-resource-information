@@ -116,6 +116,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -134,6 +135,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,10 +152,12 @@
     <ClInclude Include="IStrategy.h" />
     <ClInclude Include="SicMpiPool.h" />
     <ClInclude Include="sic_defines.h" />
+    <ClInclude Include="Sic_DeviceView.h" />
     <ClInclude Include="Sic_Memory.h" />
     <ClInclude Include="Sic_Overview.h" />
     <ClInclude Include="Sic_ProcessView.h" />
     <ClInclude Include="sic_types.h" />
+    <ClInclude Include="sic_type_deviceview.h" />
     <ClInclude Include="sic_type_overview.h" />
     <ClInclude Include="sic_type_processview.h" />
     <ClInclude Include="SysInfoColl.h" />
@@ -162,6 +166,7 @@
     <ClCompile Include="DataComm.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="SicMpiPool.cpp" />
+    <ClCompile Include="Sic_DeviceView.cpp" />
     <ClCompile Include="Sic_Memory.cpp" />
     <ClCompile Include="Sic_Overview.cpp" />
     <ClCompile Include="Sic_ProcessView.cpp" />

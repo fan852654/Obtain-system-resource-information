@@ -88,6 +88,15 @@ void Sic_ProcessView::GetProcessDetils(void)
 		PROCESS_MEMORY_COUNTERS pmc;
 		hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, _procentry.th32ProcessID);
 		if (hProcess) {
+			DWORD handleCount;
+			ZeroMemory(&handleCount, sizeof(DWORD));
+			if (GetProcessHandleCount(hProcess, &obj.HandleCount)) {
+#pragma omp atomic
+				m_processview->HandleCount += obj.HandleCount;
+			}
+			else {
+				obj.Status |= ProcessViewDetilStatus::FAILED_QUERY_HANDLE_COUNT;
+			}
 			if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)))
 			{
 				obj.parseFrom(pmc);

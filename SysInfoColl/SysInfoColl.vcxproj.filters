@@ -57,6 +57,12 @@
     <ClInclude Include="SicMpiPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Sic_DeviceView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sic_type_deviceview.h">
+      <Filter>头文件\types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -81,6 +87,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SicMpiPool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_DeviceView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

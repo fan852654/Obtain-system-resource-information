@@ -19,7 +19,8 @@ namespace SIC_TYPE_PROCESSVIEW {
 		PVDS_NO_ERROR,
 		FAILED_OPEN_PROCESS = 0x00000001,
 		FAILED_QUERY_MEMORY_INFO = 0x00000002,
-		FAILED_QUERY_TIMES_INFO = 0x00000004
+		FAILED_QUERY_TIMES_INFO = 0x00000004,
+		FAILED_QUERY_HANDLE_COUNT = 0x00000008
 	};
 	struct ProcessObj
 	{
@@ -54,6 +55,8 @@ namespace SIC_TYPE_PROCESSVIEW {
 		FILETIME lpKernelTime{ 0 };
 		//进程占用用户时间
 		FILETIME lpUserTime{ 0 };
+		//句柄数量
+		unsigned long HandleCount{ 0 };
 		//CPU使用时间
 		double cpuUsageTime;
 		double cpuUsage;
@@ -81,12 +84,14 @@ namespace SIC_TYPE_PROCESSVIEW {
 			Status = ProcessViewStatus::PVS_NO_ERROR;
 			ProcessCount = 0;
 			ThreadsCount = 0;
+			HandleCount = 0;
 		}
 		~_Processview() {
 		}
 		int Status;
 		int ProcessCount;
-		long long ThreadsCount;
+		unsigned long long ThreadsCount;
+		unsigned long long HandleCount;
 		std::vector<ProcessObj> ProcessDetils;
 	}Processview;
 	typedef Processview* PProcessview;
