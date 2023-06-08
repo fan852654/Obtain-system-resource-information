@@ -48,6 +48,15 @@
     <ClInclude Include="sic_defines.h">
       <Filter>头文件\types</Filter>
     </ClInclude>
+    <ClInclude Include="Sic_ProcessView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sic_type_processview.h">
+      <Filter>头文件\types</Filter>
+    </ClInclude>
+    <ClInclude Include="SicMpiPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -67,6 +76,12 @@
     </ClCompile>
     <ClCompile Include="sic_type_memory.h">
       <Filter>头文件\types</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_ProcessView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SicMpiPool.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

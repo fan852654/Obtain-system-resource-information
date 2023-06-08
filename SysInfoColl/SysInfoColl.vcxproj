@@ -148,18 +148,23 @@
     <ClInclude Include="DataComm.h" />
     <ClInclude Include="DllFuncDef.h" />
     <ClInclude Include="IStrategy.h" />
+    <ClInclude Include="SicMpiPool.h" />
     <ClInclude Include="sic_defines.h" />
     <ClInclude Include="Sic_Memory.h" />
     <ClInclude Include="Sic_Overview.h" />
+    <ClInclude Include="Sic_ProcessView.h" />
     <ClInclude Include="sic_types.h" />
     <ClInclude Include="sic_type_overview.h" />
+    <ClInclude Include="sic_type_processview.h" />
     <ClInclude Include="SysInfoColl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataComm.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="SicMpiPool.cpp" />
     <ClCompile Include="Sic_Memory.cpp" />
     <ClCompile Include="Sic_Overview.cpp" />
+    <ClCompile Include="Sic_ProcessView.cpp" />
     <ClCompile Include="sic_type_memory.h" />
     <ClCompile Include="SysInfoColl.cpp" />
   </ItemGroup>
