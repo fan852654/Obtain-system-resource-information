@@ -21,5 +21,4 @@ private:
 protected:
 	std::mutex m_lockPool;
 };
-SicMpiPool* SicMpiPool::instancePool = nullptr;
 #endif // !SICMPIPOOL_H

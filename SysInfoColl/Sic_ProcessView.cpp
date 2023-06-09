@@ -123,7 +123,7 @@ void Sic_ProcessView::GetProcessDetils(void)
 		resultLocker.unlock();
 	};
 	ParseProcNextFunc(stcPe32);
-#pragma omp parallel for num_threads(ompNumThreads) shared(hProcessSnap)
+#pragma omp parallel num_threads(ompNumThreads) shared(hProcessSnap)
 	{
 		int index = omp_get_thread_num();
 #pragma omp critical

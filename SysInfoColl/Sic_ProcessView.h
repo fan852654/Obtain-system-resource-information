@@ -6,7 +6,6 @@
 #include <tlhelp32.h>
 #include <atlbase.h>
 #include <map>
-#include "SicMpiPool.h"
 
 static std::mutex* m_mutex_process = new std::mutex;
 static PProcessview m_processview = nullptr;

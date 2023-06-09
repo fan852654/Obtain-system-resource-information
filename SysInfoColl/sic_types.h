@@ -6,6 +6,7 @@
 #ifndef SIC_TYPES_H
 #define SIC_TYPES_H
 
+#include "SicMpiPool.h"
 #include <mutex>
 #include <string>
 #include <Windows.h>
