@@ -41,6 +41,7 @@ void SicMpiPool::ReleaseOmpThread(void*& token)
 	{
 		m_iMpiUsageCnt -= fd->second;
 		m_pool.erase(fd);
+		free(token);
 	}
 	m_lockPool.unlock();
 }
