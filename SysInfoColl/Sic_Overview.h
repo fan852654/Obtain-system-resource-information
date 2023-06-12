@@ -24,6 +24,5 @@ private:
 	void GetVersionInfo(void);
 	void GetCpuInfo(void);
 };
-Sic_Overview* Sic_Overview::instance = nullptr;
 
 #endif

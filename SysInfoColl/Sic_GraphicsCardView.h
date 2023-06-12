@@ -23,6 +23,5 @@ private:
 	void GetGpuInfoByNvml(void);
 protected:
 };
-Sic_GraphicsCardView* Sic_GraphicsCardView::instance = nullptr;
 
 #endif

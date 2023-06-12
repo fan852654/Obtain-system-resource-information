@@ -27,6 +27,5 @@ private:
 	void GetDeviceList(void);
 protected:
 };
-Sic_DeviceView* Sic_DeviceView::instance = nullptr;
 
 #endif

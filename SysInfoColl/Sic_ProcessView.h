@@ -30,5 +30,4 @@ private:
 protected:
 	BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
 };
-Sic_ProcessView* Sic_ProcessView::instance = nullptr;
 #endif

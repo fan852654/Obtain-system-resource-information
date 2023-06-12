@@ -75,10 +75,9 @@ SIC_TYPE::Sic_return Sic_DeviceView::GetUnAndInstalledDeives(std::vector<DeviceO
 void Sic_DeviceView::GetDeviceList(void)
 {
 	std::vector<DeviceObj> result;
-	LPGUID lpGuid = (LPGUID)&GUID_CLASS_USB_HUB;//
 	int INTERFACE_DETAIL_SIZE = 1024;
 	int nCount = 0;
-	HDEVINFO info = SetupDiGetClassDevs(lpGuid, NULL, NULL, DIGCF_ALLCLASSES | DIGCF_PRESENT);
+	HDEVINFO info = SetupDiGetClassDevs(NULL, NULL, NULL, DIGCF_ALLCLASSES | DIGCF_PRESENT);
 
 	//enumerate device information  
 	DWORD required_size = 0;

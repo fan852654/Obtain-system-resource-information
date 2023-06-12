@@ -18,13 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="all_types.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DataComm.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SysInfoColl.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="IStrategy.h">
@@ -75,9 +69,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DataComm.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SysInfoColl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Sic_Overview.cpp">

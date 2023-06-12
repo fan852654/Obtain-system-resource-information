@@ -24,7 +24,6 @@ public:
 private:
 	void GetGlobalMemoryInfo(void);
 };
-Sic_Memory* Sic_Memory::instance = nullptr;
 
 
 #endif

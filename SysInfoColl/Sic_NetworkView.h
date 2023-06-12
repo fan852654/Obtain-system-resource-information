@@ -11,6 +11,9 @@
 #include "wininet.h"
 #pragma comment(lib,"ws2_32.lib")
 #pragma comment(lib,"Iphlpapi.lib")
+#pragma comment(lib, "rasapi32.lib")
+
+#pragma comment(lib, "Wininet.lib")
 
 static std::mutex* m_mutex_network = new std::mutex;
 static PNetworkview m_networkview = nullptr;
@@ -32,7 +35,6 @@ private:
 	BOOL GetWinetProxy(LPSTR lpszProxy, UINT nProxyLen);
 	BOOL RefreshNetowrkTables(void);
 };
-Sic_Network* Sic_Network::instance = nullptr;
 
 
 #endif

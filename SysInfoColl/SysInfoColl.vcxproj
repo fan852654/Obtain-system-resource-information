@@ -146,7 +146,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="all_types.h" />
     <ClInclude Include="DataComm.h" />
     <ClInclude Include="DllFuncDef.h" />
     <ClInclude Include="IStrategy.h" />
@@ -162,7 +161,6 @@
     <ClInclude Include="sic_type_deviceview.h" />
     <ClInclude Include="sic_type_overview.h" />
     <ClInclude Include="sic_type_processview.h" />
-    <ClInclude Include="SysInfoColl.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataComm.cpp" />
@@ -177,7 +175,6 @@
     <ClCompile Include="Sic_ProcessView.cpp" />
     <ClCompile Include="sic_type_memory.h" />
     <ClCompile Include="sic_type_networkview.h" />
-    <ClCompile Include="SysInfoColl.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
