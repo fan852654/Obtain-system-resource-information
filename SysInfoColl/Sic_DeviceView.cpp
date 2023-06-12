@@ -31,7 +31,8 @@ SIC_TYPE::Sic_return Sic_DeviceView::GetUnAndInstalledDeives(std::vector<DeviceO
 {
 	std::vector<DeviceObj> olddevices = std::vector<DeviceObj>(m_deviceview->DevicesVector);
 	GetDeviceList();
-	int ompNumThreads = SicMpiPool::getInstance()->GetOmpThreadsNumbers();
+	void* threadToken = nullptr;
+	int ompNumThreads = SicMpiPool::getInstance()->GetOmpThreadsNumbers(threadToken, 2);
 	std::set<std::wstring> instanceIds;
 #pragma omp parallel num_threads(ompNumThreads) private(instanceIds)
 	{
@@ -67,6 +68,7 @@ SIC_TYPE::Sic_return Sic_DeviceView::GetUnAndInstalledDeives(std::vector<DeviceO
 			}
 		}
 	}
+	SicMpiPool::getInstance()->ReleaseOmpThread(threadToken);
 	return SIC_TYPE::Sic_return::SIC_NO_ERROR;
 }
 
@@ -85,8 +87,8 @@ void Sic_DeviceView::GetDeviceList(void)
 	DWORD DataT;
 	DWORD buffersize = 1024;
 	DWORD req_bufsize = 0;
-
-	int ompNumThreads = SicMpiPool::getInstance()->GetOmpThreadsNumbers();
+	void* threadToken = nullptr;
+	int ompNumThreads = SicMpiPool::getInstance()->GetOmpThreadsNumbers(threadToken ,2);
 	std::map<int, SP_DEVINFO_DATA> tmp;
 	for (int j = 0; j < ompNumThreads; j++)
 	{
@@ -122,6 +124,7 @@ void Sic_DeviceView::GetDeviceList(void)
 			result.push_back(obj);
 		}
 	}
+	SicMpiPool::getInstance()->ReleaseOmpThread(threadToken);
 	SetupDiDestroyDeviceInfoList(info);
 	m_deviceview->DevicesVector.clear();
 	m_deviceview->DevicesVector.insert(m_deviceview->DevicesVector.begin(), result.begin(), result.end());
@@ -130,10 +133,9 @@ void Sic_DeviceView::GetDeviceList(void)
 
 Sic_DeviceView* Sic_DeviceView::getInstance()
 {
-	m_mutex_device->lock();
+	std::lock_guard<std::mutex> lock(*m_mutex_device);
 	if (instance == nullptr) {
 		instance = new Sic_DeviceView;
 	}
-	m_mutex_device->unlock();
 	return instance;
 }

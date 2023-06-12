@@ -145,10 +145,9 @@ void Sic_Overview::GetCpuInfo(void)
 
 Sic_Overview* Sic_Overview::getInstance()
 {
-	m_mutex_overview->lock();
+	std::lock_guard<std::mutex> lock(*m_mutex_overview);
 	if (instance == nullptr) {
 		instance = new Sic_Overview;
 	}
-	m_mutex_overview->unlock();
 	return instance;
 }

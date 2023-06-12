@@ -63,6 +63,12 @@
     <ClInclude Include="sic_type_deviceview.h">
       <Filter>头文件\types</Filter>
     </ClInclude>
+    <ClInclude Include="Sic_GraphicsCardView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Sic_NetworkView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -91,6 +97,18 @@
     </ClCompile>
     <ClCompile Include="Sic_DeviceView.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_GraphicsCardView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sic_type_graphicscardview.h">
+      <Filter>头文件\types</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_NetworkView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sic_type_networkview.h">
+      <Filter>头文件\types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

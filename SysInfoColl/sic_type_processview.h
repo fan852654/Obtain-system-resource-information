@@ -3,6 +3,9 @@
 #define SIC_TYPE_PROCESSVIEW_H
 
 #include "sic_defines.h"
+#include <tchar.h>
+#include <stdio.h>
+#include <iostream>
 #include <vector>
 #include <Psapi.h>
 #pragma comment(lib,"psapi.lib")
@@ -79,6 +82,19 @@ namespace SIC_TYPE_PROCESSVIEW {
 			return(tt.QuadPart);
 		}
 	};
+	struct ServicesObj
+	{
+		//服务进程名
+		WCHAR* m_name;
+		//服务进程id
+		unsigned int m_pid = 0;
+		//服务显示名称
+		std::wstring m_dispName;
+		//服务状态
+		unsigned int m_state = 0;
+		std::wstring  m_group;
+		std::wstring  m_path;
+	};
 	typedef struct _Processview {
 		_Processview() {
 			Status = ProcessViewStatus::PVS_NO_ERROR;
@@ -93,6 +109,7 @@ namespace SIC_TYPE_PROCESSVIEW {
 		unsigned long long ThreadsCount;
 		unsigned long long HandleCount;
 		std::vector<ProcessObj> ProcessDetils;
+		std::vector<ServicesObj> ServiceDetils;
 	}Processview;
 	typedef Processview* PProcessview;
 }

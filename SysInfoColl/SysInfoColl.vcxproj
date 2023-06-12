@@ -153,7 +153,9 @@
     <ClInclude Include="SicMpiPool.h" />
     <ClInclude Include="sic_defines.h" />
     <ClInclude Include="Sic_DeviceView.h" />
+    <ClInclude Include="Sic_GraphicsCardView.h" />
     <ClInclude Include="Sic_Memory.h" />
+    <ClInclude Include="Sic_NetworkView.h" />
     <ClInclude Include="Sic_Overview.h" />
     <ClInclude Include="Sic_ProcessView.h" />
     <ClInclude Include="sic_types.h" />
@@ -165,12 +167,16 @@
   <ItemGroup>
     <ClCompile Include="DataComm.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="sic_type_graphicscardview.h" />
     <ClCompile Include="SicMpiPool.cpp" />
     <ClCompile Include="Sic_DeviceView.cpp" />
+    <ClCompile Include="Sic_GraphicsCardView.cpp" />
     <ClCompile Include="Sic_Memory.cpp" />
+    <ClCompile Include="Sic_NetworkView.cpp" />
     <ClCompile Include="Sic_Overview.cpp" />
     <ClCompile Include="Sic_ProcessView.cpp" />
     <ClCompile Include="sic_type_memory.h" />
+    <ClCompile Include="sic_type_networkview.h" />
     <ClCompile Include="SysInfoColl.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

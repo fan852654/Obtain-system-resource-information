@@ -46,10 +46,9 @@ void Sic_Memory::GetGlobalMemoryInfo(void)
 }
 Sic_Memory* Sic_Memory::getInstance()
 {
-	m_mutex_memory->lock();
+	std::lock_guard<std::mutex> lock(*m_mutex_memory);
 	if (instance == nullptr) {
 		instance = new Sic_Memory;
 	}
-	m_mutex_memory->unlock();
 	return instance;
 }

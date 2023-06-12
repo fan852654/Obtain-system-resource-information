@@ -21,6 +21,7 @@ Sic_ProcessView::~Sic_ProcessView()
 void Sic_ProcessView::Execute(void)
 {
 	GetProcessDetils();
+	GetServiceDetils();
 }
 
 std::string Sic_ProcessView::GetErrors(void)
@@ -69,7 +70,8 @@ void Sic_ProcessView::GetProcessDetils(void)
 			SetPrivilege(hToken, SE_DEBUG_NAME, TRUE);
 		}
 	}
-	int ompNumThreads = SicMpiPool::getInstance()->GetOmpThreadsNumbers();
+	void* threadToken = nullptr;
+	int ompNumThreads = SicMpiPool::getInstance()->GetOmpThreadsNumbers(threadToken, 2);
 	std::map<int, PROCESSENTRY32> tmp;
 	for (int i = 0; i < ompNumThreads; i++)
 	{
@@ -135,6 +137,7 @@ void Sic_ProcessView::GetProcessDetils(void)
 		}
 	}
 	CloseHandle(hProcessSnap);
+	SicMpiPool::getInstance()->ReleaseOmpThread(threadToken);
 	if (SetDebugFlag && hToken)
 	{
 		SetPrivilege(hToken, SE_DEBUG_NAME, FALSE);
@@ -144,13 +147,83 @@ void Sic_ProcessView::GetProcessDetils(void)
 	m_processview->ProcessDetils = std::vector<ProcessObj>(result);
 }
 
+void Sic_ProcessView::GetServiceDetils(void)
+{
+	SC_HANDLE schSCService;
+	schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+
+	void* buf_for_status = NULL, * buf_for_config = NULL;
+	DWORD bufSize = 0;
+	DWORD moreBytesNeeded, serviceCount;
+	ENUM_SERVICE_STATUS_PROCESS* servicesStatus;
+	QUERY_SERVICE_CONFIG* servicesConfig;
+
+	for (;;)
+	{
+		if (EnumServicesStatusEx(schSCManager, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+			(LPBYTE)buf_for_status, bufSize, &moreBytesNeeded, &serviceCount, NULL, NULL))
+		{
+			servicesStatus = (ENUM_SERVICE_STATUS_PROCESS*)buf_for_status;
+			break;
+		}
+
+		int err = GetLastError();
+		if (ERROR_MORE_DATA != err)
+		{
+			free(buf_for_status);
+			return;
+		}
+		bufSize += moreBytesNeeded;
+		buf_for_status = new LPSTR[bufSize]();
+		moreBytesNeeded = 0;
+	}
+
+	std::vector<ServicesObj> servList(serviceCount);
+	std::wstring tmpStr;
+	void* threadToken = nullptr;
+	int ompNumThreads = SicMpiPool::getInstance()->GetOmpThreadsNumbers(threadToken, 2);
+
+#pragma omp parallel for schedule(dynamic) private (buf_for_config,schSCService,servicesConfig,tmpStr)
+	for (int i = 0; i < serviceCount; i++)
+	{
+		servList[i].m_name = servicesStatus[i].lpServiceName;
+		servList[i].m_pid = servicesStatus[i].ServiceStatusProcess.dwProcessId;
+		servList[i].m_dispName = servicesStatus[i].lpDisplayName;
+		servList[i].m_state = servicesStatus[i].ServiceStatusProcess.dwCurrentState;
+
+		buf_for_config = new QUERY_SERVICE_CONFIG[4096]();
+
+		schSCService = OpenService(schSCManager, servicesStatus[i].lpServiceName, SERVICE_QUERY_CONFIG | SERVICE_QUERY_STATUS | SERVICE_ENUMERATE_DEPENDENTS | SERVICE_INTERROGATE);
+		QueryServiceConfig(schSCService, (LPQUERY_SERVICE_CONFIGW)buf_for_config, 4096, &moreBytesNeeded);
+		servicesConfig = (LPQUERY_SERVICE_CONFIGW)buf_for_config;
+
+		if (servicesConfig->lpBinaryPathName != nullptr)
+		{
+			tmpStr = servicesConfig->lpBinaryPathName;
+
+			int flag = tmpStr.find(L"-k");
+			if (flag > 0)
+			{
+				servList[i].m_path.insert(servList[i].m_path.begin(), tmpStr.begin(), tmpStr.begin() + flag);
+				servList[i].m_group.insert(servList[i].m_group.begin(), tmpStr.begin() + flag + 2, tmpStr.end());
+			}
+			else servList[i].m_path.insert(servList[i].m_path.begin(), tmpStr.begin(), tmpStr.end());
+		}
+		CloseServiceHandle(schSCService);
+	}
+
+	m_processview->ServiceDetils.clear();
+	m_processview->ServiceDetils.insert(m_processview->ServiceDetils.begin(), servList.begin(), servList.end());
+	SicMpiPool::getInstance()->ReleaseOmpThread(threadToken);
+	return;
+}
+
 Sic_ProcessView* Sic_ProcessView::getInstance()
 {
-	m_mutex_process->lock();
+	std::lock_guard<std::mutex> lock(*m_mutex_process);
 	if (instance == nullptr) {
 		instance = new Sic_ProcessView;
 	}
-	m_mutex_process->unlock();
 	return instance;
 }
 

@@ -24,6 +24,9 @@ public:
 	bool SetDebugFlag;
 private:
 	void GetProcessDetils(void);
+	void GetServiceDetils(void);
+
+	SC_HANDLE schSCManager;
 protected:
 	BOOL SetPrivilege(HANDLE hToken, LPCTSTR lpszPrivilege, BOOL bEnablePrivilege);
 };
