@@ -16,6 +16,12 @@
     <Filter Include="头文件\types">
       <UniqueIdentifier>{c79b0075-a26c-482d-9570-ba072e013521}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\SIC_Assembly">
+      <UniqueIdentifier>{4bf14e3e-a53a-4b36-bd5a-e143f5c06bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\SIC_Assembly">
+      <UniqueIdentifier>{cbf30236-098e-4f7b-bcfb-f08a938c6afd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataComm.h">
@@ -24,13 +30,7 @@
     <ClInclude Include="IStrategy.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Sic_Overview.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="DllFuncDef.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sic_Memory.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="sic_types.h">
@@ -42,25 +42,34 @@
     <ClInclude Include="sic_defines.h">
       <Filter>头文件\types</Filter>
     </ClInclude>
-    <ClInclude Include="Sic_ProcessView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="sic_type_processview.h">
       <Filter>头文件\types</Filter>
-    </ClInclude>
-    <ClInclude Include="SicMpiPool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sic_DeviceView.h">
-      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="sic_type_deviceview.h">
       <Filter>头文件\types</Filter>
     </ClInclude>
+    <ClInclude Include="Sic_DeviceView.h">
+      <Filter>头文件\SIC_Assembly</Filter>
+    </ClInclude>
     <ClInclude Include="Sic_GraphicsCardView.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\SIC_Assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="Sic_Memory.h">
+      <Filter>头文件\SIC_Assembly</Filter>
     </ClInclude>
     <ClInclude Include="Sic_NetworkView.h">
+      <Filter>头文件\SIC_Assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="Sic_Overview.h">
+      <Filter>头文件\SIC_Assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="Sic_ProcessView.h">
+      <Filter>头文件\SIC_Assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="SicMpiPool.h">
+      <Filter>头文件\SIC_Assembly</Filter>
+    </ClInclude>
+    <ClInclude Include="Sic_Context.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,35 +80,38 @@
     <ClCompile Include="DataComm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Sic_Overview.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sic_Memory.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="sic_type_memory.h">
       <Filter>头文件\types</Filter>
-    </ClCompile>
-    <ClCompile Include="Sic_ProcessView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SicMpiPool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sic_DeviceView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sic_GraphicsCardView.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="sic_type_graphicscardview.h">
       <Filter>头文件\types</Filter>
     </ClCompile>
-    <ClCompile Include="Sic_NetworkView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="sic_type_networkview.h">
       <Filter>头文件\types</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_DeviceView.cpp">
+      <Filter>源文件\SIC_Assembly</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_GraphicsCardView.cpp">
+      <Filter>源文件\SIC_Assembly</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_Memory.cpp">
+      <Filter>源文件\SIC_Assembly</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_NetworkView.cpp">
+      <Filter>源文件\SIC_Assembly</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_Overview.cpp">
+      <Filter>源文件\SIC_Assembly</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_ProcessView.cpp">
+      <Filter>源文件\SIC_Assembly</Filter>
+    </ClCompile>
+    <ClCompile Include="SicMpiPool.cpp">
+      <Filter>源文件\SIC_Assembly</Filter>
+    </ClCompile>
+    <ClCompile Include="Sic_Context.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

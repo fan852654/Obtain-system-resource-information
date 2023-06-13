@@ -18,7 +18,7 @@
 static std::mutex* m_mutex_network = new std::mutex;
 static PNetworkview m_networkview = nullptr;
 
-class Sic_Network :IStrategy
+class Sic_Network : public IStrategy
 {
 public:
 	static Sic_Network* instance;

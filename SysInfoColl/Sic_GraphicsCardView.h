@@ -8,7 +8,7 @@
 static std::mutex* m_mutex_graphics = new std::mutex;
 static PGraphicsCardview m_graphicsview = nullptr;
 
-class Sic_GraphicsCardView :IStrategy
+class Sic_GraphicsCardView : public IStrategy
 {
 public:
 	static Sic_GraphicsCardView* instance;

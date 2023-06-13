@@ -10,7 +10,7 @@
 static std::mutex* m_mutex_process = new std::mutex;
 static PProcessview m_processview = nullptr;
 
-class Sic_ProcessView:IStrategy
+class Sic_ProcessView: public IStrategy
 {
 public:
 	static Sic_ProcessView* instance;

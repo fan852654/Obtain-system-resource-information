@@ -11,7 +11,7 @@
 static std::mutex* m_mutex_memory = new std::mutex;
 static PMemoryview m_memoryview = nullptr;
 
-class Sic_Memory :IStrategy
+class Sic_Memory : public IStrategy
 {
 public:
 	static Sic_Memory* instance;

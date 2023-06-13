@@ -150,6 +150,7 @@
     <ClInclude Include="DllFuncDef.h" />
     <ClInclude Include="IStrategy.h" />
     <ClInclude Include="SicMpiPool.h" />
+    <ClInclude Include="Sic_Context.h" />
     <ClInclude Include="sic_defines.h" />
     <ClInclude Include="Sic_DeviceView.h" />
     <ClInclude Include="Sic_GraphicsCardView.h" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="DataComm.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Sic_Context.cpp" />
     <ClCompile Include="sic_type_graphicscardview.h" />
     <ClCompile Include="SicMpiPool.cpp" />
     <ClCompile Include="Sic_DeviceView.cpp" />

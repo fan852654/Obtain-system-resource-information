@@ -9,7 +9,7 @@
 static std::mutex* m_mutex_overview = new std::mutex;
 static POverview m_overview = nullptr;
 
-class Sic_Overview : IStrategy
+class Sic_Overview : public IStrategy
 {
 public:
 	static Sic_Overview* instance;

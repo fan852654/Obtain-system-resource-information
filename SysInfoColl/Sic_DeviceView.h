@@ -11,7 +11,7 @@
 static std::mutex* m_mutex_device = new std::mutex;
 static PDeviceview m_deviceview = nullptr;
 
-class Sic_DeviceView :IStrategy
+class Sic_DeviceView : public IStrategy
 {
 public:
 	static Sic_DeviceView* instance;
