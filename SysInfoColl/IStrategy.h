@@ -17,7 +17,7 @@ public:
 	};
 	~IStrategy() {};
 
-	static SIC_TYPE::Sic_return getSystemInfo(SIC_TYPE::SystemInfos** _si) { *_si = m_sysInfo; return SIC_TYPE::SIC_NO_ERROR; };
+	static SIC_TYPE::Sic_return getSystemInfo(SIC_TYPE::SystemInfos** _si) { SIC_TYPE::PSystemInfos res = new SIC_TYPE::SystemInfos; res->CopyFrom(*m_sysInfo); *_si = res; return SIC_TYPE::SIC_NO_ERROR; };
 	virtual void Execute(void) = 0;
 	virtual std::string GetErrors(void) = 0;
 private:

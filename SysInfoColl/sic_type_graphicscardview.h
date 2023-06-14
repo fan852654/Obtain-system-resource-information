@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include "sic_defines.h"
+#include <mutex>
 namespace SIC_TYPE_GRAPHICSCARDVIEW {
 	enum GraphicsCardViewStatus {
 		GCVS_NO_ERROR = 0,
@@ -47,12 +48,24 @@ namespace SIC_TYPE_GRAPHICSCARDVIEW {
 		_GraphicsCardview() {
 			Status = GraphicsCardViewStatus::GCVS_NO_ERROR;
 			GpuDetils = std::vector<GpuInfo_Nvml>();
+			m_dataLocker = new std::mutex;
 		}
 		~_GraphicsCardview() {
+			delete m_dataLocker;
+			m_dataLocker = nullptr;
+		}
+		void CopyFrom(const _GraphicsCardview& _src) {
+			this->GpuDetils.clear();
+			this->GetGpuErrorsInLoops.clear();
+			std::lock_guard<std::mutex>lc(*_src.m_dataLocker);
+			this->Status = _src.Status;
+			this->GpuDetils.insert(this->GpuDetils.begin(), _src.GpuDetils.begin(), _src.GpuDetils.end());
+			this->GetGpuErrorsInLoops.insert(_src.GetGpuErrorsInLoops.begin(), _src.GetGpuErrorsInLoops.end());
 		}
 		int Status;
 		std::map<int, std::pair<int, std::vector<std::string>>> GetGpuErrorsInLoops;
 		std::vector<GpuInfo_Nvml> GpuDetils;
+		std::mutex* m_dataLocker;
 	}GraphicsCardview;
 	typedef GraphicsCardview* PGraphicsCardview;
 }

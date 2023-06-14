@@ -101,8 +101,22 @@ namespace SIC_TYPE_PROCESSVIEW {
 			ProcessCount = 0;
 			ThreadsCount = 0;
 			HandleCount = 0;
+			m_dataLocker = new std::mutex;
 		}
 		~_Processview() {
+			delete m_dataLocker;
+			m_dataLocker = nullptr;
+		}
+		void CopyFrom(const _Processview& _src) {
+			this->ProcessDetils.clear();
+			this->ServiceDetils.clear();
+			std::lock_guard<std::mutex>lc(*_src.m_dataLocker);
+			this->Status = _src.Status;
+			this->ProcessDetils.insert(this->ProcessDetils.begin(), _src.ProcessDetils.begin(), _src.ProcessDetils.end());
+			this->ServiceDetils.insert(this->ServiceDetils.begin(), _src.ServiceDetils.begin(), _src.ServiceDetils.end());
+			this->ProcessCount = _src.ProcessCount;
+			this->ThreadsCount = _src.ThreadsCount;
+			this->HandleCount = _src.HandleCount;
 		}
 		int Status;
 		int ProcessCount;
@@ -110,6 +124,7 @@ namespace SIC_TYPE_PROCESSVIEW {
 		unsigned long long HandleCount;
 		std::vector<ProcessObj> ProcessDetils;
 		std::vector<ServicesObj> ServiceDetils;
+		std::mutex* m_dataLocker;
 	}Processview;
 	typedef Processview* PProcessview;
 }

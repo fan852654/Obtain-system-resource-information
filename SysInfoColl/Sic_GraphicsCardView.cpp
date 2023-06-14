@@ -19,6 +19,7 @@ Sic_GraphicsCardView::~Sic_GraphicsCardView()
 
 void Sic_GraphicsCardView::Execute(void)
 {
+	std::lock_guard<std::mutex> lc(*m_graphicsview->m_dataLocker);
 	GetGpuInfoByNvml();
 }
 

@@ -20,6 +20,7 @@ Sic_ProcessView::~Sic_ProcessView()
 
 void Sic_ProcessView::Execute(void)
 {
+	std::lock_guard<std::mutex> lc(*m_processview->m_dataLocker);
 	GetProcessDetils();
 	GetServiceDetils();
 }

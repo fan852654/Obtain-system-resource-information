@@ -13,6 +13,9 @@
 #include "Sic_ProcessView.h"
 #include <thread>
 #include <map>
+#include <chrono>
+#include <future>
+#include <ctime>
 
 typedef enum SicContextAssembly
 {
@@ -32,6 +35,12 @@ typedef enum SicContextAssembly
 						Sic_ProcessView 
 };
 
+typedef enum SicThreadLoopStatus {
+	Loop_None,
+	Loop_Begin,
+	Loop_Running,
+	Loop_Stop
+};
 
 typedef struct AssemblyStatus
 {
@@ -71,13 +80,16 @@ public:
 	SIC_TYPE::Sic_return SetAssemblyDisable(unsigned long _assemblyDisable);
 
 private:
-	void Exec(void);
+	void Exec(std::future<void>);
 	void Init(void);
+	void InitThreadLoop(void);
 	void RefreshNeedAssembly(unsigned long _assemblyEnable);
 private:
 	std::mutex m_AssemblyLocker;
-	std::thread m_AssemblyLoopThread;
+	std::thread* m_AssemblyLoopThread{ 0 };
+	SicThreadLoopStatus m_AssemblyThreadStatus;
 	std::map<SicContextAssembly, AssemblyStatus*> m_AssemblyLoopmap;
+	std::promise<void>* exitSignal{ 0 };
 };
 
 #endif

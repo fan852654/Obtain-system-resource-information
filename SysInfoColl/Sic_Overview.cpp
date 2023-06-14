@@ -19,6 +19,7 @@ Sic_Overview::~Sic_Overview()
 
 void Sic_Overview::Execute(void)
 {
+	std::lock_guard<std::mutex> lc(*m_overview->m_dataLocker);
 	GetSystemOverView();
 	GetVersionInfo();
 	GetCpuInfo();

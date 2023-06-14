@@ -19,6 +19,7 @@ Sic_DeviceView::~Sic_DeviceView()
 
 void Sic_DeviceView::Execute(void)
 {
+	std::lock_guard<std::mutex> lc(*m_deviceview->m_dataLocker);
 	GetDeviceList();
 }
 

@@ -2,12 +2,28 @@
 
 Sic_Context::Sic_Context(unsigned long _assemblyEnable)
 {
+	m_AssemblyThreadStatus = SicThreadLoopStatus::Loop_None;
 	Init();
+	InitThreadLoop();
 	RefreshNeedAssembly(_assemblyEnable);
 }
 
 Sic_Context::~Sic_Context()
 {
+	if (exitSignal && m_AssemblyLoopThread) {
+		exitSignal->set_value();
+		for (int i = 0; i < 5; i++)
+		{
+			if (m_AssemblyThreadStatus == SicThreadLoopStatus::Loop_Stop)
+				break;
+			Sleep(500);
+		}
+		if (m_AssemblyThreadStatus != SicThreadLoopStatus::Loop_Stop) {
+			TerminateThread(m_AssemblyLoopThread->native_handle(), 0);
+		}
+		delete m_AssemblyLoopThread;
+		m_AssemblyLoopThread = NULL;
+	}
 	SetAssemblyDisable(SicContextAssembly::Sic_AllAssembly);
 }
 
@@ -123,19 +139,71 @@ SIC_TYPE::Sic_return Sic_Context::SetAssemblyDisable(unsigned long _assemblyDisa
 	return SIC_TYPE::Sic_return::SIC_NO_ERROR;
 }
 
-void Sic_Context::Exec(void)
+void Sic_Context::Exec(std::future<void> _stopFlag)
 {
-	
+	m_AssemblyThreadStatus = SicThreadLoopStatus::Loop_Running;
+	SicContextAssembly order[6] = { 
+			SicContextAssembly::Sic_OverView,SicContextAssembly::Sic_MemoryView,
+			SicContextAssembly::Sic_ProcessView,SicContextAssembly::Sic_NetworkView,
+			SicContextAssembly::Sic_DeviceView,SicContextAssembly::Sic_GraphicsCardView
+	};
+	bool breakLoop = false;
+	while (_stopFlag.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout && !breakLoop)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		try 
+		{
+			std::time_t now = std::time(NULL);
+			for (int i = 0; i < 6; i++)
+			{
+				if (m_AssemblyLoopmap.find(order[i]) != m_AssemblyLoopmap.end()) {
+					if (!m_AssemblyLoopmap[order[i]] || !m_AssemblyLoopmap[order[i]]->Enabled ||
+						!m_AssemblyLoopmap[order[i]]->NeedRefreshLoop || !m_AssemblyLoopmap[order[i]]->AssemblyPtr)
+						continue;
+					if (now - m_AssemblyLoopmap[order[i]]->LastRunningTime >= m_AssemblyLoopmap[order[i]]->Interval) {
+						std::lock_guard<std::mutex> execlock(m_AssemblyLoopmap[order[i]]->ExecLocker);
+						m_AssemblyLoopmap[order[i]]->Executing = true;
+						m_AssemblyLoopmap[order[i]]->LastRunningTime = now;
+						m_AssemblyLoopmap[order[i]]->AssemblyPtr->Execute();
+						m_AssemblyLoopmap[order[i]]->Executing = false;
+					}
+				}
+				if (breakLoop = _stopFlag.wait_for(std::chrono::milliseconds(1)) != std::future_status::timeout)
+					break;
+			}
+		}
+		catch (...)
+		{
+			;
+		}
+	}
+
+	m_AssemblyThreadStatus = SicThreadLoopStatus::Loop_Stop;
+	return;
 }
 
 void Sic_Context::Init(void)
 {
+	SicMpiPool::getInstance()->ChangeMaxPoolCnt(std::thread::hardware_concurrency() * 0.75);
+
 	m_AssemblyLoopmap[SicContextAssembly::Sic_OverView] = new AssemblyStatus;
 	m_AssemblyLoopmap[SicContextAssembly::Sic_DeviceView] = new AssemblyStatus;
 	m_AssemblyLoopmap[SicContextAssembly::Sic_GraphicsCardView] = new AssemblyStatus;
 	m_AssemblyLoopmap[SicContextAssembly::Sic_MemoryView] = new AssemblyStatus;
 	m_AssemblyLoopmap[SicContextAssembly::Sic_NetworkView] = new AssemblyStatus;
 	m_AssemblyLoopmap[SicContextAssembly::Sic_ProcessView] = new AssemblyStatus;
+
+}
+
+void Sic_Context::InitThreadLoop(void)
+{
+	if(!exitSignal)
+		exitSignal = new std::promise<void>;
+	std::future<void> exitFuture = exitSignal->get_future();
+	if(!m_AssemblyLoopThread)
+		m_AssemblyLoopThread = new std::thread(Exec, std::move(exitFuture));
+	m_AssemblyThreadStatus = SicThreadLoopStatus::Loop_Begin;
+	m_AssemblyLoopThread->join();
 }
 
 void Sic_Context::RefreshNeedAssembly(unsigned long _assemblyEnable)

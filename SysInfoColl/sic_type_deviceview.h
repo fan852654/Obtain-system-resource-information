@@ -32,11 +32,21 @@ namespace SIC_TYPE_DEVICEVIEW
 		_Deviceview() {
 			Status = DeviceViewStatus::DVS_NO_ERROR;
 			DevicesVector = std::vector<DeviceObj>();
+			m_dataLocker = new std::mutex;
 		}
 		~_Deviceview() {
+			delete m_dataLocker;
+			m_dataLocker = nullptr;
+		}
+		void CopyFrom(const _Deviceview& _src) {
+			this->DevicesVector.clear();
+			std::lock_guard<std::mutex>lc(*_src.m_dataLocker);
+			this->Status = _src.Status;
+			this->DevicesVector.insert(this->DevicesVector.begin(), _src.DevicesVector.begin(), _src.DevicesVector.end());
 		}
 		int Status;
 		std::vector<DeviceObj> DevicesVector;
+		std::mutex* m_dataLocker;
 	}Deviceview;
 	typedef Deviceview* PDeviceview;
 }

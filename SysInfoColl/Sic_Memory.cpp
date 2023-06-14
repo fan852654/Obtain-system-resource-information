@@ -19,6 +19,7 @@ Sic_Memory::~Sic_Memory()
 
 void Sic_Memory::Execute(void)
 {
+	std::lock_guard<std::mutex> lc(*m_memoryview->m_dataLocker);
 	GetGlobalMemoryInfo();
 }
 

@@ -28,6 +28,20 @@ namespace SIC_TYPE
 
 	typedef struct _SystemInfos
 	{
+		void CopyFrom(const _SystemInfos& _src) {
+			m_OverView = new Overview;
+			m_OverView->CopyFrom(*_src.m_OverView);
+			m_MemoryView = new Memoryview;
+			m_MemoryView->CopyFrom(*_src.m_MemoryView);
+			m_ProcessView = new Processview;
+			m_ProcessView->CopyFrom(*_src.m_ProcessView);
+			m_DeviceView = new Deviceview;
+			m_DeviceView->CopyFrom(*_src.m_DeviceView);
+			m_GpuView = new GraphicsCardview;
+			m_GpuView->CopyFrom(*_src.m_GpuView);
+			m_NetworkView = new Networkview;
+			m_NetworkView->CopyFrom(*_src.m_NetworkView);
+		}
 		POverview m_OverView{ 0 };
 		PMemoryview m_MemoryView{ 0 };
 		PProcessview m_ProcessView{ 0 };

@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 
 namespace SIC_TYPE_NETWORKVIEW
 {
@@ -41,8 +42,24 @@ namespace SIC_TYPE_NETWORKVIEW
 			RasConnections = 0;
 			tcpNetworks = std::vector<TcpNetworkStatus>();
 			udpNetworks = std::vector<UdpNetworkStatus>();
+			m_dataLocker = new std::mutex;
 		}
 		~_Networkview() {
+			delete m_dataLocker;
+			m_dataLocker = nullptr;
+		}
+		void CopyFrom(const _Networkview& _src) {
+			this->tcpNetworks.clear();
+			this->networkIps.clear();
+			this->udpNetworks.clear();
+			std::lock_guard<std::mutex>lc(*_src.m_dataLocker);
+			this->Status = _src.Status;
+			this->tcpNetworks.insert(this->tcpNetworks.begin(), _src.tcpNetworks.begin(), _src.tcpNetworks.end());
+			this->networkIps.insert(this->networkIps.begin(), _src.networkIps.begin(), _src.networkIps.end());
+			this->udpNetworks.insert(this->udpNetworks.begin(), _src.udpNetworks.begin(), _src.udpNetworks.end());
+			this->RasConnections = _src.RasConnections;
+			this->proxyStr = _src.proxyStr;
+			memcpy_s(this->host_name, sizeof(this->host_name), _src.host_name, sizeof(_src.host_name));
 		}
 		int Status;
 		char host_name[255];
@@ -51,6 +68,7 @@ namespace SIC_TYPE_NETWORKVIEW
 		int RasConnections;
 		std::vector<TcpNetworkStatus> tcpNetworks;
 		std::vector<UdpNetworkStatus> udpNetworks;
+		std::mutex* m_dataLocker;
 	}Networkview;
 	typedef Networkview* PNetworkview;
 }

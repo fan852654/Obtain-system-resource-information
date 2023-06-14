@@ -53,16 +53,30 @@ namespace SIC_TYPE_OVERVIEW {
 			m_osInfo = new OsInfo;
 			m_cpuInfo = new CpuInfo;
 			m_runInfo = new SysRunningInfo;
+			m_dataLocker = new std::mutex;
 		}
 		~_Overview() {
 			delete m_osInfo;
+			m_osInfo = nullptr;
 			delete m_cpuInfo;
+			m_cpuInfo = nullptr;
 			delete m_runInfo;
+			m_runInfo = nullptr;
+			delete m_dataLocker;
+			m_dataLocker = nullptr;
+		}
+		void CopyFrom(const _Overview& _src) {
+			std::lock_guard<std::mutex>lc(*_src.m_dataLocker);
+			this->Status = _src.Status;
+			memcpy_s(this->m_osInfo, sizeof(OsInfo), _src.m_osInfo, sizeof(OsInfo));
+			memcpy_s(this->m_cpuInfo, sizeof(CpuInfo), _src.m_cpuInfo, sizeof(CpuInfo));
+			memcpy_s(this->m_runInfo, sizeof(SysRunningInfo), _src.m_runInfo, sizeof(SysRunningInfo));
 		}
 		int Status;
 		OsInfo* m_osInfo;
 		CpuInfo* m_cpuInfo;
 		SysRunningInfo* m_runInfo;
+		std::mutex* m_dataLocker;
 	}Overview;
 	typedef Overview* POverview;
 

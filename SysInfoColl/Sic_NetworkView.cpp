@@ -19,6 +19,7 @@ Sic_Network::~Sic_Network()
 
 void Sic_Network::Execute(void)
 {
+	std::lock_guard<std::mutex> lc(*m_networkview->m_dataLocker);
 	GetGlobalNetworkInfo();
 }
 
