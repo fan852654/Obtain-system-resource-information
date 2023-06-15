@@ -72,6 +72,9 @@
     <ClInclude Include="Sic_Context.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MemoryPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -111,6 +114,9 @@
       <Filter>源文件\SIC_Assembly</Filter>
     </ClCompile>
     <ClCompile Include="Sic_Context.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

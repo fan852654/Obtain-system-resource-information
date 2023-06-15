@@ -1,4 +1,5 @@
 ﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
+#include "MemoryPool.h"
 #include "SicMpiPool.h"
 #include "Sic_DeviceView.h"
 #include "Sic_GraphicsCardView.h"
@@ -23,7 +24,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
-
+MemoryPool* MemoryPool::instance = nullptr;
 SicMpiPool* SicMpiPool::instancePool = nullptr;
 Sic_ProcessView* Sic_ProcessView::instance = nullptr;
 Sic_Overview* Sic_Overview::instance = nullptr;
