@@ -56,9 +56,10 @@ typedef struct _MEMORY_LOOKDOWN_LIST {
 namespace LookdownList {
 	static int NORMAL_4K_SIZE[4] = { 4,8,16,32 };
 	static PMEMORY_LOOKDOWN_LIST instance = nullptr;
-	static PMEMORY_LOOKDOWN_LIST InitializeLookdownList();
+	static PMEMORY_LOOKDOWN_LIST InitializeLookdownList(PALLOCATE_FUNCTION _allocatefunc = nullptr, PFREE_FUNCTION _freefunc = nullptr);
+	static void SetAllocateOrFreeFuncToLookDownBySize(PMEMORY_LOOKDOWN_LIST _trunk, size_t _size, PALLOCATE_FUNCTION _allocatefunc = nullptr, PFREE_FUNCTION _freefunc = nullptr);
 	static void ReleaseLookdownList();
-	static void* AllocateFromLookdownList(__in PMEMORY_LOOKDOWN_LIST _lookdownlist);
+	static void* AllocateFromLookdownList(__in PMEMORY_LOOKDOWN_LIST _lookdownlist, size_t _size);
 	static void FreeToLookdownList(__in PMEMORY_LOOKDOWN_LIST _lookdownlist, __in void* _node);
 };
 
