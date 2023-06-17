@@ -80,16 +80,16 @@ public:
 	SIC_TYPE::Sic_return SetAssemblyDisable(unsigned long _assemblyDisable);
 
 private:
-	void Exec(std::future<void>);
 	void Init(void);
 	void InitThreadLoop(void);
 	void RefreshNeedAssembly(unsigned long _assemblyEnable);
+public:
+	SicThreadLoopStatus m_AssemblyThreadStatus;
+	std::map<SicContextAssembly, AssemblyStatus*> m_AssemblyLoopmap;
 private:
 	std::mutex m_AssemblyLocker;
 	std::thread* m_AssemblyLoopThread{ 0 };
-	SicThreadLoopStatus m_AssemblyThreadStatus;
-	std::map<SicContextAssembly, AssemblyStatus*> m_AssemblyLoopmap;
 	std::promise<void>* exitSignal{ 0 };
 };
-
+static void Exec(Sic_Context* _context,std::future<void>);
 #endif

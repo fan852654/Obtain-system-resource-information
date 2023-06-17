@@ -3,6 +3,7 @@
 #define SIC_TYPE_OVERVIEW_H
 
 #include <Windows.h>
+#include <mutex>
 #include "sic_defines.h"
 namespace SIC_TYPE_OVERVIEW {
 
@@ -65,6 +66,7 @@ namespace SIC_TYPE_OVERVIEW {
 			delete m_dataLocker;
 			m_dataLocker = nullptr;
 		}
+		std::mutex* m_dataLocker;
 		void CopyFrom(const _Overview& _src) {
 			std::lock_guard<std::mutex>lc(*_src.m_dataLocker);
 			this->Status = _src.Status;
@@ -76,7 +78,6 @@ namespace SIC_TYPE_OVERVIEW {
 		OsInfo* m_osInfo;
 		CpuInfo* m_cpuInfo;
 		SysRunningInfo* m_runInfo;
-		std::mutex* m_dataLocker;
 	}Overview;
 	typedef Overview* POverview;
 

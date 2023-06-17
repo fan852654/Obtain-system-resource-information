@@ -24,7 +24,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
-MemoryPool* MemoryPool::instance = nullptr;
 SicMpiPool* SicMpiPool::instancePool = nullptr;
 Sic_ProcessView* Sic_ProcessView::instance = nullptr;
 Sic_Overview* Sic_Overview::instance = nullptr;
