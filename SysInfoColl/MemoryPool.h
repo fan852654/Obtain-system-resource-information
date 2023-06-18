@@ -22,12 +22,19 @@ typedef void(*PFREE_FUNCTION)(void*);
 typedef struct _GENERAL_MEMORY_BLOCK {
 	void* Memory_Ptr;
 	_GENERAL_MEMORY_BLOCK* next;
-
+	void* _trunk; 
+	_GENERAL_MEMORY_BLOCK* pre;
+	bool used;
+	void* LookdownTrunk;
 }GENERAL_MEMORY_BLOCK,* PGENERAL_MEMORY_BLOCK;
+
+constexpr int GENERAL_MEMORY_PTR_SIZE = sizeof(PGENERAL_MEMORY_BLOCK);
+constexpr int GENERAL_INT_SIZE = sizeof(int);
+constexpr int GMB_2_TRUNK_PTRSIZE = (GENERAL_MEMORY_PTR_SIZE + sizeof(void*)) / GENERAL_INT_SIZE;
 
 typedef struct _GENERAL_LOOKDOWN {
 	PGENERAL_MEMORY_BLOCK MemoryBlocksHead;
-	PGENERAL_MEMORY_BLOCK MemoryBlocksUsed;
+	PGENERAL_MEMORY_BLOCK MemoryBlocksEnd;
 	USHORT Depth;
 	USHORT MaxinumDepth;
 	ULONG TotalAllocates;
@@ -79,7 +86,7 @@ namespace LookdownList {
 	static PMEMORY_LOOKDOWN_LIST InitializeLookdownList(PALLOCATE_FUNCTION _allocatefunc = nullptr, PFREE_FUNCTION _freefunc = nullptr);
 	static void SetAllocateOrFreeFuncToLookDownBySize(PMEMORY_LOOKDOWN_LIST _trunk, size_t _size, PALLOCATE_FUNCTION _allocatefunc = nullptr, PFREE_FUNCTION _freefunc = nullptr);
 	static PGENERAL_LOOKDOWN AddLookdownTrunkToLookdownList(PMEMORY_LOOKDOWN_LIST _trunk, size_t _size);
-	static PGENERAL_MEMORY_BLOCK GeneralMemoryBlock(void* ptr, size_t _size, int _count);
+	static PGENERAL_MEMORY_BLOCK GeneralMemoryBlock(void* ptr, size_t _size, int _count, PMEMORY_LOOKDOWN_LIST _trunkptr, PGENERAL_LOOKDOWN _parent);
 	static bool ReleaseLookdownList(__in PMEMORY_LOOKDOWN_LIST _trunk, bool force = false);
 
 	static void* AllocateFromLookdownList(__in PMEMORY_LOOKDOWN_LIST _lookdownlist, size_t _size);

@@ -41,16 +41,19 @@ PGENERAL_LOOKDOWN LookdownList::AddLookdownTrunkToLookdownList(PMEMORY_LOOKDOWN_
 	result->Depth = MININUM_LOOKDOWN_DEPTH;
 	result->MaxinumDepth = MXNINUM_LOOKDOWN_DEPTH;
 	void* tank = result->Allocate(_size * result->Depth);
-	result->MemoryBlocksHead = GeneralMemoryBlock(tank, _size, result->Depth);
+	result->MemoryBlocksHead = GeneralMemoryBlock(tank, _size, result->Depth, _trunk, result);
 	result->allocatedBlock.push(result->MemoryBlocksHead);
-	result->MemoryBlocksUsed = nullptr;
 	return result;
 }
 
-PGENERAL_MEMORY_BLOCK LookdownList::GeneralMemoryBlock(void* ptr, size_t _size, int _count)
+PGENERAL_MEMORY_BLOCK LookdownList::GeneralMemoryBlock(void* ptr, size_t _size, int _count, PMEMORY_LOOKDOWN_LIST _trunkptr,PGENERAL_LOOKDOWN _parent)
 {
 	if (!ptr) return nullptr;
 	PGENERAL_MEMORY_BLOCK result = new GENERAL_MEMORY_BLOCK;
+	result->_trunk = _trunkptr;
+	result->used = false;
+	result->pre = nullptr;
+	result->LookdownTrunk = _parent;
 	PGENERAL_MEMORY_BLOCK end = result;
 	void* ptrindex = ptr;
 	for (int i = 0; i < _count; ++i)
@@ -63,6 +66,10 @@ PGENERAL_MEMORY_BLOCK LookdownList::GeneralMemoryBlock(void* ptr, size_t _size, 
 		end->Memory_Ptr = ptrindex;
 		if (i != _count - 1) {
 			end->next = new GENERAL_MEMORY_BLOCK;
+			end->_trunk = _trunkptr;
+			end->used = false;
+			end->pre = end;
+			end->LookdownTrunk = _parent;
 			end = end->next;
 		}
 		else {
@@ -70,7 +77,8 @@ PGENERAL_MEMORY_BLOCK LookdownList::GeneralMemoryBlock(void* ptr, size_t _size, 
 		}
 		ptrindex = &ptrindex + _size;
 	}
-
+	_parent->MemoryBlocksEnd = end;
+	
 	return result;
 }
 
@@ -90,7 +98,7 @@ bool LookdownList::ReleaseLookdownList(__in PMEMORY_LOOKDOWN_LIST _trunk, bool f
 		if (!force) {
 			while (nodehead)
 			{
-				if (nodehead->MemoryBlocksUsed) {
+				if (nodehead->MemoryBlocksHead && nodehead->MemoryBlocksHead->used) {
 					return false;
 				}
 				nodehead = nodehead->next;
@@ -102,13 +110,6 @@ bool LookdownList::ReleaseLookdownList(__in PMEMORY_LOOKDOWN_LIST _trunk, bool f
 			PGENERAL_LOOKDOWN nxt = nodehead->next;
 
 			for (PGENERAL_MEMORY_BLOCK hd = nodehead->MemoryBlocksHead;hd;)
-			{
-				PGENERAL_MEMORY_BLOCK pmbnxt = hd->next;
-				delete hd;
-				hd = pmbnxt;
-			}
-
-			for (PGENERAL_MEMORY_BLOCK hd = nodehead->MemoryBlocksUsed;hd;)
 			{
 				PGENERAL_MEMORY_BLOCK pmbnxt = hd->next;
 				delete hd;
@@ -139,11 +140,50 @@ void* LookdownList::AllocateFromLookdownList(__in PMEMORY_LOOKDOWN_LIST _lookdow
 		_lookdownlist->misshitAllocateSize.insert(_lookdownlist->misshitAllocateSize.begin(), Targetsize);
 		return _lookdownlist->Allocate(_size);
 	}
-	return nullptr;
+	void* resptr = nullptr;
+	ldb->blockLocker.lock();
+	if (ldb->MemoryBlocksHead) {
+		++ldb->AllocateHits;
+		resptr = ldb->MemoryBlocksHead->Memory_Ptr;
+		ldb->MemoryBlocksHead->used = true;
+		ldb->MemoryBlocksHead->pre = ldb->MemoryBlocksEnd;
+		ldb->MemoryBlocksEnd->next = ldb->MemoryBlocksHead;
+		PGENERAL_MEMORY_BLOCK headnext = ldb->MemoryBlocksHead->next;
+		ldb->MemoryBlocksHead->next = nullptr;
+		ldb->MemoryBlocksHead = headnext;
+	}
+	else {
+		++ldb->AllocateMisses;
+		resptr = ldb->Allocate(_size);
+	}
+	ldb->blockLocker.unlock();
+	++ldb->TotalAllocates;
+	return resptr;
 }
 
 void LookdownList::FreeToLookdownList(__in PMEMORY_LOOKDOWN_LIST _lookdownlist,__in void* _node)
 {
+	if (!_lookdownlist)return;
+	void** ptrTrunk = (void**)((int*)_node + GMB_2_TRUNK_PTRSIZE);
+	if (ptrTrunk == (void*)_lookdownlist) {
+		PGENERAL_MEMORY_BLOCK block = (PGENERAL_MEMORY_BLOCK)_node;
+		PGENERAL_LOOKDOWN lookdowntrunk = (PGENERAL_LOOKDOWN)block->LookdownTrunk;
+		lookdowntrunk->blockLocker.lock();
+
+		block->used = false;
+		block->pre->next = block->next;
+		if (!block->next)
+			lookdowntrunk->MemoryBlocksEnd = block->pre;
+		block->pre = nullptr;
+		block->next = lookdowntrunk->MemoryBlocksHead;
+		lookdowntrunk->MemoryBlocksHead->pre = block;
+		lookdowntrunk->MemoryBlocksHead = block;
+
+		lookdowntrunk->blockLocker.unlock();
+	}
+	else {
+		_lookdownlist->Free(_node);
+	}
 }
 
 int LookdownList::GetTargetSizeBySize(int _size)
